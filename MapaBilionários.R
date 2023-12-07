@@ -6,15 +6,15 @@ library(raster)
 library(RColorBrewer)
 library(htmlwidgets)
 
-spdf_fortified <- read.csv("spdf_fortified.csv")
+mapa <- shapefile("shapefile mundo/TM_WORLD_BORDERS_SIMPL-0.3.shp")
+
+spdf_fortified <- st_as_sf(mapa)
 
 spdf_fortified$NAME[spdf_fortified$NAME == "Korea, Republic of"] <- "South Korea"
 spdf_fortified$NAME[spdf_fortified$NAME == "United Republic of Tanzania"] <- "Tanzania"
 spdf_fortified$NAME[spdf_fortified$NAME == "Viet Nam"] <- "Vietnam"
 
 join_data <- full_join(spdf_fortified, paises1, by = "NAME")
-
-mapa <- shapefile("shapefile mundo/TM_WORLD_BORDERS_SIMPL-0.3.shp")
 
 mybins <- c(0,10,20,50,100,500,800)
 mypalette <- colorBin(palette="YlOrBr", domain= join_data$n, na.color="transparent", bins=mybins)
