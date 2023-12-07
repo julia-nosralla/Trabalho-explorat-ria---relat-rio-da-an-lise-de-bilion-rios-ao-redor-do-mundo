@@ -39,34 +39,20 @@ cat("O valor de R² é:", r_squared, "\n")
 ```{r, echo=FALSE}
 library(kableExtra)
 
-tabela_resumo <- bil%>%
+tabela_resumo <- Banco_de_dados %>%
   group_by(gender) %>%
   summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana = median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth/n)) %>%
   mutate(
     Genero = gender,
     Media = round(Media, 2),
     S = round(S, 2),
-    Outliers = round(Outliers, 3)
-  ) %>%
+    Outliers = round(Outliers, 3)) %>%
 select(Genero, Media, Mediana, S, Min, Max, Outliers, n) %>%
   arrange(desc(Outliers))
   
-kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em Bilhões")
-%>%
-  Kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE)
-%>%
+kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em Bilhões") %>%
+  Kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) %>%
   column_spec(4, width = "1cm")%>%
   column_spec(8, width = "1cm")%>%
   column_spec(2, width = "1cm")
-
-  
 ```
-# Análise da hipótese
-
-### Há associação entre o gênero e o patrimônio acumulado/total
-
-Antes de procedermos à análise de associação, é relevante considerar algumas observações sobre as variáveis em questão. O primeiro bloco de dados revela uma disparidade significativa entre o número de observações para o gênero masculino em comparação com o feminino. No entanto, é crucial destacar que a análise proposta não busca estabelecer causalidade, sendo essa discrepância mencionada apenas a título de curiosidade.
-
-Ao examinar o boxplot, é evidente a presença de vários outliers na distribuição do patrimônio para o gênero masculino. A caixa correspondente a esse grupo é visualmente menor, sugerindo, inicialmente, uma maior homogeneidade nos dados em comparação com o gênero feminino. Contudo, essa impressão é contrabalançada ao considerarmos o cálculo do desvio padrão. Os resultados indicam que a distribuição do patrimônio para o gênero feminino é mais centralizada, uma vez que apresenta menos outliers, mesmo que a caixa seja mais ampla.
-
-A análise do coeficiente de determinação (R²) é crucial para avaliar a existência de associação entre as variáveis. Notavelmente, o valor obtido revela-se muito baixo, indicando uma associação extremamente fraca. Essa análise leva à conclusão de que as variáveis gênero e patrimônio total são praticamente independentes uma da outra. Assim, a hipótese de associação não se sustenta, reforçando a ideia de que não há uma relação substancial entre o gênero e o patrimônio total nos dados analisados.
