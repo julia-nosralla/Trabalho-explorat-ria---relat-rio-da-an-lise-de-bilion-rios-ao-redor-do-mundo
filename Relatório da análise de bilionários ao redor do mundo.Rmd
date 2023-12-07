@@ -1,0 +1,146 @@
+---
+title: "Relatório da análise de bilionários ao redor do mundo"
+author: "Maria Luiza Moura"
+date: "2023-12-07"
+output: pdf_document
+---
+
+# Introdução
+\justify
+ 
+  O conjunto de dados escolhido para este estudo exploratório é o "Bilionaires Statistics Dataset", obtido do Kaggle. Este banco de dados compreende 2640 observações e 35 variáveis, incluindo informações sobre o patrimônio total de cada bilionário, país de origem, idade, gênero e a origem de sua riqueza.
+  O objetivo deste estudo é investigar o comportamento do patrimônio total acumulado em relação a variáveis de diferentes categorias, visando identificar possíveis associações entre elas.
+  
+# Metodologia
+\justify
+  Este conjunto de dados abrange um total de 35 variáveis que armazenam dados sobre bilionários, porém, para conduzir uma análise exploratória mais direcionada, os responsáveis pelo estudo optaram por selecionar variáveis que, inicialmente, apresentam indícios de associação. Essa abordagem visa aprimorar a eficácia da análise ao concentrar-se em aspectos específicos que podem revelar padrões ou relações significativas nos dados. A seleção criteriosa dessas variáveis permite uma investigação mais focalizada e, potencialmente, uma compreensão mais profunda dos fenômenos em estudo. 
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+val_metodologia <- data.frame(
+  Variavel = c("countryofcitizenship", "country", "latitude_country", "longitude_country", "industries", "source", "finalWorth", "age", "gender"),
+  Explicacao = c("O país de cidadania do bilionário","O país de origem do bilionário", "Latitude geográfica do país do bilionário", "Longitude geográfica do país do bilionário","Setores de indústrias em que o bilionário está envolvido", "A fonte ou origem da riqueza do bilionário, como negócios próprios, herança, investimentos, etc", "A fortuna final do bilionário, indicando o valor total de sua riqueza em dólares", "A idade do bilionário", "Gênero do bilionário")
+)
+
+kable(val_metodologia, caption = "Explicação das Variáveis") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE)
+
+```
+
+  Para o estudo das variáveis, foram empregadas medidas de centralidade (como média e mediana) e medidas de dispersão (como desvio padrão e variância). Além disso, foram realizados cálculos estatísticos para verificar a existência de associações entre as variáveis e para quantificar a força dessas associações.
+  A análise é complementada por tabelas e gráficos que proporcionam uma representação visual do comportamento de cada variável, facilitando a interpretação dos resultados. Essa abordagem abrangente visa fornecer uma compreensão profunda das relações entre as variáveis no contexto dos bilionários estudados.
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(kableExtra)
+
+med_metodologia <- data.frame(
+  Medidas = c("Média", "Mediana", "Desvio Padrão", "Mínimo", "Máximo", "Assimetria"),
+  Formula = c(
+    "$\\bar{x} = \\frac{1}{n} \\sum_{i=1}^{n} x_i$",
+    "Mediana = $\\begin{cases} x_{(k)} & \\text{se } n \\text{ é ímpar,} \\\\ \\frac{1}{2} (x_{(k)} + x_{(k+1)}) & \\text{se } n \\text{ é par,} \\end{cases}$",
+    "$s = \\sqrt{\\frac{\\sum_{i=1}^{n} (x_i - \\bar{x})^2}{n-1}}$",
+    "$\\min(x)$",
+    "$\\max(x)$",
+    "$\\text{Assimetria} = \\frac{\\frac{1}{n} \\sum_{i=1}^{n} (x_i - \\bar{x})^3}{\\left(\\frac{1}{n} \\sum_{i=1}^{n} (x_i - \\bar{x})^2\\right)^{3/2}}$"
+  )
+)
+
+kable(med_metodologia, "latex", booktabs = TRUE, escape = FALSE) %>%
+  kable_styling(latex_options = "striped", position = "center")
+``` 
+
+# Resultados
+
+## 1. A Europa é o continente com maior concentração de bilionários
+
+## 2. A indústria tecnológica gera mais renda para os bilionários
+
+## 3. Existe associação entre a variável patrimônio e idade
+
+## 4. Existem mais bilionários fundadores/empreendedores do que os outros
+
+## 5. Existem mais bilionários com cidadania europeia
+
+## 6. Há associação entre a variável gênero e o patrimônio total
+```{r, echo=FALSE}
+library(readr)
+Banco_de_dados <- read_csv("exploratória/Billionaires Statistics Dataset.csv")
+Banco_de_dados <- Banco_de_dados %>%
+  mutate(finalWorth = finalWorth/1000)
+
+genero <- Banco_de_dados$gender
+patrimonio_bilhoes <- Banco_de_dados$finalWorth
+```
+
+```{r, echo=FALSE}
+library(dplyr)
+contagem_genero <- count(Banco_de_dados, gender)
+contagem_genero
+#Se quiser incluir isso na tabela que tem ali embaixo, acho que seria legal. Entretanto sugeriram que eu mencionasse a quantidade e tirasse os valores daqui.
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(title = " Boxplot: Gênero vs. patrimônio total em bilhões de dólares", x = "Gênero", y = "Patrimônios em bilhões")
+Objeto_analise
+```
+
+
+```{r, echo=FALSE}
+modelo <- lm(patrimonio_bilhoes ~ genero)
+resumo_modelo <- summary(modelo)
+r_squared <- resumo_modelo$r.squared
+cat("O valor de R² é:", r_squared, "\n")
+```
+
+
+```{r, echo=FALSE}
+library(kableExtra)
+
+tabela_resumo <- Banco_de_dados %>%
+  group_by(gender) %>%
+  summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana = median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth/n)) %>%
+  mutate(
+    Genero = gender,
+    Media = round(Media, 2),
+    S = round(S, 2),
+    Outliers = round(Outliers, 3)) %>%
+select(Genero, Media, Mediana, S, Min, Max, Outliers, n) %>%
+  arrange(desc(Outliers))
+  
+kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em Bilhões") %>%
+  Kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) %>%
+  column_spec(4, width = "1cm")%>%
+  column_spec(8, width = "1cm")%>%
+  column_spec(2, width = "1cm")
+```
+
+  Antes de procedermos à análise de associação, é relevante considerar algumas observações sobre as variáveis em questão. O conjunto de dados revela uma disparidade significativa entre o número de observações para o gênero masculino em comparação com o feminino, afinal, neste banco de dados existem 2640 observações e somente 337 delas são referentes a pessoas do gênero Feminino. Embora a disparidade persista, é essencial destacar um aumento significativo, a cerca de 50%, no número de mulheres bilionárias nos últimos anos. Esse aumento supera até mesmo o crescimento observado entre os homens no mesmo período. Assim, embora a maioria dos dados ainda esteja centrada no gênero masculino, a presença feminina registrou um notável e considerável aumento. 
+  É crucial destacar que a análise proposta não busca estabelecer causalidade. Desse modo, não se pode prever a realidade das mulheres que não são bilionárias e o porquê disso.
+
+  Ao examinar o boxplot, é evidente a presença de vários outliers na distribuição do patrimônio para o gênero masculino. A caixa correspondente a esse grupo é visualmente menor, sugerindo, inicialmente, uma maior homogeneidade nos dados em comparação com o gênero feminino. Contudo, essa impressão é contrabalançada ao considerarmos o cálculo do desvio padrão. Os resultados indicam que a distribuição do patrimônio para o gênero feminino é mais centralizada, uma vez que apresenta menos outliers, mesmo que a caixa seja mais ampla. É válido observar que ambas as caixas são iniciadas do mesmo ponto, indicando a possibilidade de pelo menos um homem e uma mulher possuírem o mesmo patrimônio.  
+
+  A análise do coeficiente de determinação (R²) é crucial para avaliar a existência de associação entre as variáveis. Notavelmente, o valor obtido revela-se muito baixo, indicando uma associação extremamente fraca. Essa análise nos leva a crer que as variáveis gênero e patrimônio total são praticamente independentes uma da outra. Assim, a hipótese de associação não se sustenta, reforçando a ideia de que não há uma relação substancial entre o gênero e o patrimônio total nos dados analisados. 
+  
+
+# Discussão
+Há um debate em curso sobre a presença de bilionários em nosso planeta. Compreender o comportamento das variáveis associadas a eles torna-se fundamental para discernir os dados verdadeiros relacionados a esse fenômeno. Apesar das inúmeras limitações intrínsecas à nossa pesquisa, uma vez que se trata de uma análise exploratória, cuja generalização para a população e aprofundamento nas interferências nas variáveis não são viáveis, ainda assim podemos confirmar suspeitas ou nos surpreender com resultados inesperados. Um exemplo notável ocorreu quando, inicialmente, esperávamos encontrar fortes associações em hipóteses específicas, mas os resultados revelaram associações menos significativas.
+
+Como mencionado anteriormente, a análise exploratória é restrita em termos de ferramentas e não permite uma abordagem exaustiva de todas as variáveis conforme planejado. Um exemplo ilustrativo é a inicial intenção de examinar a influência dos bilionários sobre o país, uma questão que, devido à impossibilidade de inferências e à complexidade das variáveis envolvidas, não pôde ser incluída no escopo do projeto. Além disso, enfrentamos desafios consideráveis na organização e filtragem do banco de dados para extrair todas as informações necessárias para conduzir uma análise abrangente e robusta.
+
+# Referências bibliográficas
+## Extração dos dados:
+https://www.linkedin.com/pulse/para-que-serve-um-bilion%C3%A1rio-maite-schneider
+https://www.forbes.com/real-time-billionaires/#2e5847b53d78
+https://www.kaggle.com/code/achmadryanfauzi/bilionares-statistic-2023-data-insight
+## Medidas estatísticas:
+BUSSAB, W. O.; MORETTIN, P. A. Estatística Básica. 9. ed. São Paulo: Pearson, 2017.
+
+# Participações
+Júlia Lima Nosralla (232014825): Análises 1 e 5.
+Gabriel Henrique Ovídeo de Araújo (232014905): Análises 2 e 4, revisão do relatório.
+Leonardo: Análise 3.
+Maria Luiza Moura de Resende Ferro Costa (232014880): Análise 6 e relatório.
