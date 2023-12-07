@@ -6,6 +6,8 @@ library(raster)
 library(RColorBrewer)
 library(htmlwidgets)
 
+spdf_fortified <- read.csv("spdf_fortified.csv")
+
 spdf_fortified$NAME[spdf_fortified$NAME == "Korea, Republic of"] <- "South Korea"
 spdf_fortified$NAME[spdf_fortified$NAME == "United Republic of Tanzania"] <- "Tanzania"
 spdf_fortified$NAME[spdf_fortified$NAME == "Viet Nam"] <- "Vietnam"
@@ -41,4 +43,4 @@ leaflet(mapa) %>%
   ) %>%
   addLegend(pal=mypalette, values=~join_data$n, opacity=0.9, title = "Concentração de bilionários", position = "bottomleft" )
 
-m 
+m
