@@ -1,0 +1,137 @@
+---
+title: "Trabalho de exploratória"
+author: "Júlia Lima Nosralla"
+date: "2023-12-07"
+output: pdf_document
+---
+
+##trabalho de exploratória (análises Júlia)
+
+##baixando os dados
+
+```{r, echo=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+
+banco <- read.csv("Billionaires Statistics Dataset (1).csv", na.strings = "")
+
+```
+
+##instalando pacotes
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, warning= FALSE}
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, dplyr, ggplot2, knitr, ggthemes, psych, kableExtra, formattable)
+
+if(!require("leaflet")) install.packages("leaflet")
+
+if(!require("sf")) install.packages("sf")
+
+if(!require("broom")) install.packages("broom")
+
+if(!require("raster")) install.packages("raster")
+
+if(!require("RColorBrewer")) install.packages("RColorBrewer")
+
+if(!require("countrycode")) install.packages("countrycode")
+```
+
+##Manipulação de dados para construção de tabelas e gráficos
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, warning= FALSE}
+library(tidyverse)
+library(countrycode)
+
+banco <- read.csv("Billionaires Statistics Dataset (1).csv", na.strings = "")
+
+banco$continent <-countrycode(sourcevar = banco[, "country"], 
+                              origin = "country.name",
+                              destination = "continent")
+
+banco$continentOfCitizenship <-countrycode(sourcevar = banco[, "countryOfCitizenship"], 
+                              origin = "country.name",
+                              destination = "continent")
+
+paises1 <- banco %>%
+  group_by(country) %>%
+  count()
+
+paises1 <- rename(paises1, NAME = country)
+
+paises1 <- na.omit(paises1)
+```
+ 
+
+\newpage
+
+##Distribuição de bilionários ao redor do mundo
+
+###Países
+
+O mapa a seguir, que apresenta a quantidade de bilionários em cada país analisado, pode ser utilizado para melhor compreender a distribuição de bilionários ao redor do mundo.
+
+#mapa aqui
+
+```{r, echo=FALSE, error=FALSE, warning=TRUE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+
+paises2 <- paises1 %>% 
+  arrange(desc(n)) %>% 
+  {.[0:15,]}
+
+colnames(paises2) <- c("País", "Número de bilionários")
+
+kable(paises2, format = "latex", caption = "Quinze países com maior número de bilionários") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) %>%
+  column_spec(4, width = "1cm") %>%
+  column_spec(2, width = "1cm")%>%
+  column_spec(8, width = "1cm")
+```
+Com base no mapa e na tabela acima, observa-se que os países com maior número de bilionários são os Estados Unidos, a China e a Índia, de modo que concentram 54,24% dos bilionários do mundo. Ademais, a quantidade de bilionários nos Estados Unidos e na China é significativamente maior do que nos demais países.
+
+###Continentes
+
+Ademais, para a análise da quantidade de bilionários por continente, foi foram feitos os seguintes gráficos:
+
+```{r, echo=FALSE, error=FALSE, warning=TRUE, message=FALSE}
+library(tidyverse)
+library(scales)
+library(ggthemes)
+
+continente <- banco %>%
+  filter(!is.na(continent)) %>%
+  count(continent) %>%
+  mutate(continent = case_when(
+    continent %>% str_detect("Asia") ~ "Ásia",
+    continent %>% str_detect("Americas") ~ "Américas",
+    continent %>% str_detect("Europe") ~ "Europa",
+    continent %>% str_detect("Oceania") ~ "Oceania",
+    continent %>% str_detect("Africa") ~ "África"
+  )) %>%
+  mutate(
+    freq = n %>% percent(),
+  ) %>%
+  mutate(
+    freq = paste0(round(100*n/sum(n), digits = 2),'%'),
+    label = str_c(n, " (", gsub("\\.", ",", freq), ")") %>% str_squish()
+  )
+
+ggplot(continente) +
+  aes(x = fct_reorder(continent, n, .desc=T), y = n, label = label) +
+  geom_bar(stat = "identity", fill = "#A1D68B", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, hjust = .5,
+    size = 3
+  ) + 
+  scale_y_continuous(limits = c(0,1100)) +
+  labs(x = "Continente", y = "Número de bilionários") +
+  theme_minimal()
+
+```
+
+#sankey
+
+A partir da análise do gráfico de barras, é possível perceber que o continente com maior número de bilionários é a Ásia, com 41,47% do total de bilionários, o que reflete a presença de países com grande concentração de bilionários, como a China e a Índia. Ademais, a África é o país com menor quantidade de bilionários.
+
+Além disso, o gráfico Sankey apresentado mostra o fluxo de bilionários de seu continente de cidadania para o continente que residem atualmente. Com base nele, nota-se pouca migração de bilionários no sentido intercontinental. Os maiores fluxos observados foram da Europa para as Américas e das Américas para a Ásia, ambos de 25 pessoas.
