@@ -563,10 +563,10 @@ https://www.kaggle.com/code/achmadryanfauzi/bilionares-statistic-2023-data-insig
 BUSSAB, W. O.; MORETTIN, P. A. Estatística Básica. 9. ed. São Paulo: Pearson, 2017.
 
 # Participações
-Júlia Lima Nosralla (232014825): Análises 4 e 5.
+Júlia Lima Nosralla (232014825): Análises 4 e 5, revisão.
 
-Gabriel Henrique Ovidio de Araújo (232014905): Análises 2 e 3, revisão do relatório.
+Gabriel Henrique Ovidio de Araújo (232014905): Análises 2,3 e relatório.
 
-Leonardo Farias Saraiva (232014834): Análise 6.
+Leonardo Farias Saraiva (232014834): Análise 6, revisão.
 
 Maria Luiza Moura de Resende Ferro Costa (232014880): Análise 1 e relatório.
