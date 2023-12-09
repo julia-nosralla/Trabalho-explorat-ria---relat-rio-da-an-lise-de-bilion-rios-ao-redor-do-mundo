@@ -182,7 +182,7 @@ patrimonio_bilhoes <- Banco_de_dados$finalWorth
 Banco_de_dados$gender <- as.factor(Banco_de_dados$gender)
 levels(Banco_de_dados$gender)<- c("Feminino", "Masculino")
 
-Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(x = "Sexo", y = "Patrimônios em bilhões", color = "Sexo")
+Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(x = "Sexo", y = "Patrimônios em bilhões", color = "Sexo") + theme_minimal() + scale_color_brewer(palette = "Accent")
 Objeto_analise
 ```
 
@@ -491,6 +491,7 @@ ggplot(continente) +
   scale_y_continuous(limits = c(0,1100)) +
   labs(x = "Continente", y = "Número de bilionários") +
   theme_minimal()
+
 
 ```
 
