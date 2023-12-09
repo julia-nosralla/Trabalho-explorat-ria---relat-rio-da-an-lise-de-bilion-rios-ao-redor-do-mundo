@@ -178,8 +178,11 @@ genero <- Banco_de_dados$gender
 patrimonio_bilhoes <- Banco_de_dados$finalWorth
 ```
 
-```{r fig-sub, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Boxplot: Gênero vs. patrimônio total em bilhões de dólares',out.width='.99\\linewidth', fig.asp=NA, fig.ncol=1, fig.nrow=2}
-Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(x = "Gênero", y = "Patrimônios em bilhões")
+```{r fig-sub, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Boxplot: Sexo vs. patrimônio total em bilhões de dólares',out.width='.99\\linewidth',fig.height=4, fig.asp=NA, fig.ncol=1, fig.nrow=2}
+Banco_de_dados$gender <- as.factor(Banco_de_dados$gender)
+levels(Banco_de_dados$gender)<- c("Feminino", "Masculino")
+
+Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(x = "Sexo", y = "Patrimônios em bilhões", color = "Sexo")
 Objeto_analise
 ```
 
@@ -432,7 +435,7 @@ O mapa a seguir, que apresenta a quantidade de bilionários em cada país analis
 
 
 \begin{center}
-    \href{https://gahenvi.github.io/map/}{Versão Interativa}
+    \href{https://gahenvi.github.io/map/}{Link de uma versão interativa}
 \end{center}
 
 
@@ -527,7 +530,7 @@ sankeyNetwork(Links = banco1, Nodes = nodes,
 ```
 
 \begin{center}
-    \href{https://gahenvi.github.io/sankey_bil/}{Versão mais completa do gráfico sankey}
+    \href{https://gahenvi.github.io/sankey_bil/}{Link de uma versão mais completa do gráfico sankey}
 \end{center}
 
 
