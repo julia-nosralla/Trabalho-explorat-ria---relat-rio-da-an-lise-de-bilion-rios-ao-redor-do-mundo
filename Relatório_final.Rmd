@@ -1,0 +1,580 @@
+---
+title:
+author: 
+date: 
+output:
+  pdf_document: default
+  html_document: default
+header-includes:
+   - \usepackage{caption, graphicx, subfig, epstopdf, enumitem}
+---
+
+
+# Introdução
+
+  O conjunto de dados escolhido para este estudo exploratório é o "Bilionaires Statistics Dataset", obtido do Kaggle. Este banco de dados compreende 2640 observações e 35 variáveis, incluindo informações sobre o patrimônio total de cada bilionário, país de origem, idade, gênero e a origem de sua riqueza.
+  O objetivo deste estudo é investigar o comportamento do patrimônio total acumulado em relação a variáveis de diferentes categorias, visando identificar possíveis associações entre elas.
+  O software utilizado para as análises foi o R versão 4.3.1.
+
+\newpage
+
+# Metodologia
+
+ Este conjunto de dados abrange um total de 35 variáveis que armazenam dados sobre bilionários, porém, para deixar o trabalho mais suscinto e organizado, foram escolhidas as variáveis que os estudantes julgaram ser mais interessantes para desenvolver a análise exploratória.
+ 
+```{r, include=FALSE}
+
+#instalando pacotes
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, dplyr, ggplot2, knitr, ggthemes, psych, kableExtra, formattable,readr, magrittr, scalegames)
+
+if(!require("leaflet")) install.packages("leaflet")
+
+if(!require("sf")) install.packages("sf")
+
+if(!require("broom")) install.packages("broom")
+
+if(!require("raster")) install.packages("raster")
+
+if(!require("RColorBrewer")) install.packages("RColorBrewer")
+
+if(!require("countrycode")) install.packages("countrycode")
+
+if(!require("devtools")) install.packages("devtools")
+
+if(!require("kableExtra")) install.packages("kableExtra")
+
+devtools::install_github("kupietz/kableExtra")
+
+```
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
+
+library(kableExtra)
+
+val_metodologia <- data.frame(
+  Variavel = c(
+    "Rank",
+    "FinalWorth",
+    "Category",
+    "PersonName",
+    "Age",
+    "Country",
+    "City",
+    "Source",
+    "Industries",
+    "CountryOfCitizenship",
+    "Organization",
+    "SelfMade",
+    "Status",
+    "Gender",
+    "Birthdate",
+    "Lastname",
+    "Firstname",
+    "Title",
+    "Date",
+    "State",
+    "Residence",
+    "BirthYear",
+    "BirthMonth",
+    "Birthday",
+    "CPI_Country",
+    "CPI_Change",
+    "GDP_Country",
+    "Education_Enrollment",
+    "Primary_Education",
+    "Life_Expectancy",
+    "Tax_Revenue",
+    "Total_Tax_Rate",
+    "Population_Country",
+    "Latitude_Country",
+    "Longitude_Country"
+  ),
+  Explicacao = c(
+    "Posição do bilionário em uma classificação ou lista.",
+    "Fortuna total do bilionário em dólares.",
+    "Categoria à qual o bilionário pertence.",
+    "Nome do bilionário.",
+    "Idade do bilionário.",
+    "País de origem do bilionário.",
+    "Cidade associada ao bilionário.",
+    "Fonte ou origem da riqueza do bilionário.",
+    "Setores de indústrias em que o bilionário está envolvido.",
+    "País de cidadania do bilionário.",
+    "Organização ou empresa associada ao bilionário.",
+    "Indica se a fortuna do bilionário foi adquirida por meio de esforços próprios.",
+    "Status do bilionário.",
+    "Gênero do bilionário.",
+    "Data de nascimento do bilionário.",
+    "Sobrenome do bilionário.",
+    "Nome próprio do bilionário.",
+    "Título associado ao bilionário.",
+    "Data associada a alguma informação específica.",
+    "Estado associado ao bilionário.",
+    "Região ou estado de residência do bilionário.",
+    "Ano de nascimento do bilionário.",
+    "Mês de nascimento do bilionário.",
+    "Dia de nascimento do bilionário.",
+    "Índice de Preços ao Consumidor (CPI) para o país do bilionário.",
+    "Mudança no Índice de Preços ao Consumidor (CPI) para o país do bilionário.",
+    "Produto Interno Bruto (PIB) do país do bilionário.",
+    "Taxa bruta de matrícula no ensino superior no país do bilionário.",
+    "Taxa bruta de matrícula no ensino fundamental no país do bilionário.",
+    "Expectativa de vida no país do bilionário.",
+    "Receita fiscal para o país do bilionário.",
+    "Taxa total de impostos para o país do bilionário.",
+    "População do país do bilionário.",
+    "Latitude geográfica do país do bilionário.",
+    "Longitude geográfica do país do bilionário."
+  )
+)
+
+kable(val_metodologia,"latex", caption = "Explicação das Variáveis") %>%
+  kable_styling(latex_options = c("striped", "hold_position", "repeat_header,scale_down"), repeat_header_text = TRUE) %>%
+  kable_styling(full_width = FALSE) 
+```
+
+
+
+  Para o estudo das variáveis, foram empregadas medidas de centralidade (como média e mediana) e medidas de dispersão (como desvio padrão e variância). Além disso, foram realizados cálculos estatísticos para verificar a existência de associações entre as variáveis e para quantificar a força dessas associações.
+  A análise é complementada por tabelas e gráficos que proporcionam uma representação visual do comportamento de cada variável, facilitando a interpretação dos resultados. Essa abordagem abrangente visa fornecer uma compreensão profunda das relações entre as variáveis no contexto dos bilionários estudados.
+  
+```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
+knitr::opts_chunk$set(echo = FALSE)
+
+med_metodologia <- data.frame(
+  Medidas = c("Média", "Mediana", "Desvio Padrão", "Mínimo", "Máximo", "Assimetria", "Coef. de Pearson", "Coef. de Determinação"),
+  Formula = c(
+    "$\\bar{x} = \\frac{1}{n} \\sum_{i=1}^{n} x_i$",
+    "$\\begin{cases} x_{(k)} & \\text{se } n \\text{ é ímpar,} \\\\ \\frac{1}{2} (x_{(k)} + x_{(k+1)}) & \\text{se } n \\text{ é par,} \\end{cases}$",
+    "$\\sqrt{\\frac{\\sum_{i=1}^{n} (x_i - \\bar{x})^2}{n-1}}$",
+    "$\\min(x)$",
+    "$\\max(x)$",
+    "$\\frac{\\frac{1}{n} \\sum_{i=1}^{n} (x_i - \\bar{x})^3}{\\left(\\frac{1}{n} \\sum_{i=1}^{n} (x_i - \\bar{x})^2\\right)^{3/2}}$",
+    "$r = \\frac{n \\sum xy - (\\sum x)(\\sum y)}{\\sqrt{[n \\sum x^2 - (\\sum x)^2][n \\sum y^2 - (\\sum y)^2]}}$",
+    "$R^2 = 1 - \\frac{\\overline{\\text{var}}(x)}{\\text{var}(x)}$"
+  )
+)
+
+kable(med_metodologia, "latex", escape = FALSE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"), position = "center")
+``` 
+
+\newpage
+
+# Resultados
+
+
+## 1. Relação entre a variável gênero e o patrimônio total
+```{r, echo=FALSE, error=FALSE, message=FALSE}
+#função para contar outliers
+count_outliers <- function(x) {
+  q <- quantile(x, probs = c(0.25, 0.75))
+  iqr <- IQR(x)
+  lower_bound <- q[1] - 1.5 * iqr
+  upper_bound <- q[2] + 1.5 * iqr
+  outliers_count <- sum(x < lower_bound | x > upper_bound)
+  return(outliers_count)
+}
+
+Banco_de_dados <- read_csv("Billionaires Statistics Dataset.csv")
+Banco_de_dados <- Banco_de_dados %>%
+  mutate(finalWorth = finalWorth/1000)
+
+genero <- Banco_de_dados$gender
+patrimonio_bilhoes <- Banco_de_dados$finalWorth
+```
+
+```{r fig-sub, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Boxplot do patrimônio total em bilhões de dólares pelo sexo',out.width='.99\\linewidth',fig.height=4, fig.asp=NA, fig.ncol=1, fig.nrow=2}
+Banco_de_dados$gender <- as.factor(Banco_de_dados$gender)
+levels(Banco_de_dados$gender)<- c("Feminino", "Masculino")
+
+Objeto_analise <- ggplot(Banco_de_dados, aes(x = genero, y = patrimonio_bilhoes, color = gender)) + geom_boxplot() + scale_y_continuous(trans = "log10") + labs(x = "Sexo", y = "Patrimônios em bilhões", color = "Sexo") + theme_minimal() + scale_color_brewer(palette = "Accent")
+Objeto_analise
+```
+
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, results= "asis"}
+modelo <- lm(patrimonio_bilhoes ~ genero)
+resumo_modelo <- summary(modelo)
+r_squared <- resumo_modelo$r.squared
+cat("O valor de R² é:", r_squared, "\n")
+```
+
+
+```{r, echo=FALSE, error=FALSE, message=FALSE}
+library(dplyr)
+tabela_resumo <- Banco_de_dados %>%
+  group_by(gender) %>%
+  summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana = median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth)/n) %>%
+  mutate(
+    Sexo = gender,
+    Media = round(Media, 2),
+    S = round(S, 2),
+    Outliers = round(Outliers, 3)) %>%
+  dplyr::select(Sexo, Media, Mediana, S, Min, Max, Outliers, n) %>%
+  arrange(desc(Outliers))
+  
+kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em Bilhões") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) %>%
+  column_spec(4, width = "1cm")%>%
+  column_spec(8, width = "1cm")%>%
+  column_spec(2, width = "1cm")
+```
+
+  Antes de procedermos à análise de associação, é relevante considerar algumas observações sobre as variáveis em questão. O conjunto de dados revela uma disparidade significativa entre o número de observações para o gênero masculino em comparação com o feminino, afinal, neste banco de dados existem 2640 observações e somente 337 delas são referentes a pessoas do gênero Feminino. Embora a disparidade persista, é essencial destacar um aumento significativo, de cerca de 50%, no número de mulheres bilionárias nos últimos anos. Esse aumento supera até mesmo o crescimento observado entre os homens no mesmo período. Assim, embora a maioria dos dados ainda esteja centrada no gênero masculino, a presença feminina registrou um notável e considerável aumento. 
+  
+  É crucial destacar que a análise proposta não busca estabelecer causalidade. Desse modo, não se pode prever a realidade das mulheres que não são bilionárias e o porquê disso.
+
+  Ao examinar o boxplot, é evidente a presença de vários outliers na distribuição do patrimônio para o gênero masculino. A caixa correspondente a esse grupo é visualmente menor, sugerindo, inicialmente, uma maior homogeneidade nos dados em comparação com o gênero feminino. Contudo, essa impressão é contrabalançada ao considerarmos o cálculo do desvio padrão. Os resultados indicam que a distribuição do patrimônio para o gênero feminino é mais centralizada, uma vez que apresenta menos outliers, mesmo que a caixa seja mais ampla. É válido observar que ambas as caixas são iniciadas do mesmo ponto, indicando a possibilidade de pelo menos um homem e uma mulher possuírem o mesmo patrimônio.  
+
+  A análise do coeficiente de determinação (R²) é crucial para avaliar a existência de associação entre as variáveis. Notavelmente, o valor obtido revela-se muito baixo, indicando uma associação extremamente fraca. Essa análise nos leva a crer que as variáveis gênero e patrimônio total são praticamente independentes uma da outra. Assim, a hipótese de associação não se sustenta, reforçando a ideia de que não há uma relação substancial entre o gênero e o patrimônio total nos dados analisados. 
+  
+
+## 2. Relação entre as indústrias e o patrimônio acumulado dos bilionários
+```{r, echo=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+bil<- read.csv("Billionaires Statistics Dataset.csv")
+bil <- bil %>%
+  mutate(finalWorth = finalWorth/1000)
+
+bil$industries <- as.factor(bil$industries)
+levels(bil$industries) <- c("Automotivo", "Construção e Engenharia", "Diversificado", 
+                            "Energia", "Moda e Varejo", "Finanças e Investimentos", 
+                            "Alimentos e Bebidas", "Jogos de Azar e Cassinos", "Cuidados de Saúde",
+                            "Logística", "Manufatura", "Mídia e Entretenimento", 
+                            "Metais e Mineração", "Imobiliário", "Serviços", 
+                            "Esportes", "Tecnologia", "Telecomunicações")
+```
+
+Para estudar a relação entre duas variáveis, é necessário primeiramente representar os dados.
+
+### Graficamente pelo box-plot:
+```{r fig-sub-2, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Box-plot do patrimônio acumulado(em log10) por bilionários daquela indústria',out.width='.99\\linewidth', fig.height=3.43, fig.asp=NA, fig.ncol=1, fig.nrow=2}
+# Cálculo do big_r (coeficiente de determinação)
+var_special <- (
+  ((21.46703^2) * 73) + ((2.17642^2) * 45) + ((9.72292^2) * 187) + ((4.80104^2) * 100) +
+  ((16.38414^2) * 266) + ((6.92745^2) * 372) + ((7.15815^2) * 212) + ((6.94346^2) * 25) +
+  ((3.27439^2) * 201) + ((8.61142^2) * 40) + ((3.46647^2) * 324) + ((11.21512^2) * 91) +
+  ((7.30113^2) * 74) + ((3.35922^2) * 193) + ((3.16698^2) * 53) + ((3.04128^2) * 39) +
+  ((14.04059^2) * 314) + ((16.51338^2) * 31)) / 2640
+big_r<- 1- var_special/var(bil$finalWorth)
+
+#boxplot de todas industrias
+ggplot(bil, aes(x=finalWorth, y=reorder(industries, finalWorth, median)))+
+  geom_boxplot()+
+  scale_x_log10()+
+  labs(
+    x = "Patrimônio Acumulado(em bilhões)",
+    y = "Indústrias")+
+  theme_minimal()+
+  scale_color_brewer(palette = "Accent")
+
+```
+
+
+Analisando o boxplot, observamos certo comportamento padronizado independente da indústria. Temos a indústria tecnológica com alta quantidade de outliers e logística com maior mediana. Contudo foi-se também calculado o coeficiente de determinação (R²) para verificar a falta de associação entre as variáveis indústria e patrimônio acumulado. O resultado do coeficiente é igual a `r round(big_r, 2)`. Como ele varia de 0 a 1 e o nosso apresenta um valor muito próximo de 0, podemos afirmar a falta de associação. Isso representa que saber ou não a indústria do bilionário, não nós ajuda a saber o patrimônio acumulado dele.
+
+
+### Pela tabela:
+
+Ademais, também foi feita uma tabela com certas medidas-resumo para descrever melhor esses dados. A coluna "Outliers" é a porcentagem da distribuição daquela indústria que são outliers.
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
+#função para contar outliers
+count_outliers <- function(x) {
+  q <- quantile(x, probs = c(0.25, 0.75))
+  iqr <- IQR(x)
+  lower_bound <- q[1] - 1.5 * iqr
+  upper_bound <- q[2] + 1.5 * iqr
+  outliers_count <- sum(x < lower_bound | x > upper_bound)
+  return(outliers_count)
+}
+
+#medidas resumo 
+tabela_resumo<- bil %>%
+  group_by(industries) %>%
+  summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana=median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth)/n) %>%
+  mutate(
+    Industria = industries,
+    Media = round(Media, 2),
+    S = round(S, 2),
+    Outliers = round(Outliers, 3)
+    ) %>%
+  dplyr::select(Industria, Media, Mediana, S, Min, Max, Outliers, n) %>%
+  arrange(desc(Outliers))
+
+
+kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em bilhões") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) %>%
+  column_spec(4, width = "1cm") %>%
+  column_spec(2, width = "1cm")%>%
+  column_spec(8, width = "1cm")
+```
+
+Através da tabela, observamos que a indústria automotiva tem a maior média e maior desvio padrão, como também segundo maior valor máximo. Essa indústria também tem a maior quantidade relativa de outliers. Suspeitamos, então de uma associação positiva entre a N (quantidade de observações daquela indústria) e o S (desvio-padrão). Ao representar gráficamente, temos:
+
+```{r fig-sub-3, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráfico de dispersão das médias pelos desvios-padrão das indústrias (em bilhões)',out.width='.99\\linewidth', fig.height=2, fig.asp=NA, fig.ncol=1, fig.nrow=2, fig.align='center', fig.pos='H'}
+
+
+
+
+r <- cor(tabela_resumo$Media, tabela_resumo$S)
+#boxplot de todas industrias
+ggplot(tabela_resumo, aes(x=Media, y=S))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE, color = "#7FC97F")+
+  geom_text(aes(x = 5.3, y = 15, label = paste("r =", round(r, 2))), size=3) +
+  theme_minimal()+
+  scale_color_brewer(palette = "Accent")
+```
+
+Dessa maneira, ao calcular o coeficiente de Pearson (r), medida que verifica o grau de relação linear entre duas variáveis quantitativas, podemos confirmar associação linear positiva e forte entre a média e o desvio-padrão do patrimônio acumulado dos bilionários separado por indústrias. O valor do coeficiente varia em modulo de 0 a 1 e, por estar muito próximo de 1, indica associação forte. Além disso, como ele é maior que 0, há uma associação positiva entre as duas variáveis. Desse modo, quanto maior o patrimônio acumulado médio da indústria, mais disperso é o patrimônio dos seus bilionários. 
+
+
+
+
+## 3. Relação entre a bilionários empreendedores ou não e seu patrimônio acumulado
+
+É necessário, em primeira instância, representar os dados graficamente. Como estamos tratando de uma variável quantitativa para duas categorias diferentes, utilizaremos novamente o boxplot.
+
+
+```{r fig-sub-4, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráficos do patrimônio acumulado separado pela variável empreendedor', fig.subcap=c('Box-plot', 'Gráfico de densidade'),  out.width='.99\\linewidth', fig.height=2.7, fig.asp=NA, fig.ncol=1, fig.nrow=2, fig.align='center', fig.pos='H'}
+#mudando os niveis de selfmade
+bil$selfMade[bil$selfMade == T]<- "Sim"
+bil$selfMade[bil$selfMade == F]<- "Não"
+
+#coeficiente de determinação(não há associação)
+var_special <- (((10.61418^2) * 828) + ((9.4553^2) * 1812)) / (1812 + 828)
+another_r <- 1 - var_special/var(bil$finalWorth)
+
+#assimetria
+as1 <- bil %>%
+  filter(selfMade == "Sim") 
+
+as1<- skew(as1$finalWorth)
+
+as2 <- bil %>%
+  filter(selfMade == "Não") 
+
+as2<- skew(as2$finalWorth)
+
+
+#boxplot
+ggplot(bil, aes(x = selfMade, y = finalWorth, fill = selfMade)) +
+  geom_boxplot() +
+  labs(x = "É empreendedor", y = "Patrimônio acumulado", fill="É empreendedor") +
+  scale_y_log10()+
+  theme_minimal()+
+  scale_color_brewer(palette = "Accent")
+
+#gráfico de densidade do patrimônio total separado emprendedor/resto
+ggplot(bil, aes(x=finalWorth))+
+  geom_density(aes(color = selfMade))+
+  scale_x_log10()+
+  labs(
+    title = ,
+    x = "Patrimônio Total",
+    y = "Densidade",
+    color = "Empreendedor"
+  )+
+  theme_minimal()+
+  scale_color_brewer(palette = "Accent")
+
+
+```
+Através do boxplot, podemos confimar a presença de múltiplos outliers independente do bilionário ser empreendedor ou não. Ao observar o gráfico de densidade, suspeita-se de uma assimetria positiva. Ao calcularmos, obtemos valores de assimetria de `r round(as1,2)` para os empreendedores e `r round(as2, 2)` para os outros. Com isso, confirmamos a presença de assimetria positiva e forte, dado que seu valor em módulo é maior que 1. Além do mais, devemos calcular o coeficiente de determinação novamente para verificar se há associação entre as duas variáveis, uma quantitativa e a outra qualitativa. Como o R² assume o valor `r round(another_r,4)`, podemos afirmar uma falta de associação, dado que esse coeficiente varia entre 0 e 1 e encontramos um valor demasiado próximo de 0. Foi-se criada também uma tabela com as medidas-resumo para melhor analisar as categorias.
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
+
+#medidas resumo 
+
+tabela_sm<- bil %>%
+  group_by(selfMade) %>%
+  summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana=median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth)/n) %>%
+  mutate(
+    Media = round(Media, 2),
+    S = round(S, 2),
+    Outliers = round(Outliers, 2),
+    Empreendedor = selfMade
+    ) %>%
+  arrange(desc(Mediana)) %>%
+  dplyr::select(Empreendedor, Media, Mediana, S, Min, Max, Outliers, n)
+
+
+kable(tabela_sm,format="latex" , caption = "Medidas do patrimônio acumulado em bilhões") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+Pela tabela, podemos observar um comportamento muito parecido em quase todos os níveis, apesar da quantidade de bilionários empreendedores ser muito maior. Da mesma maneira, temos os bilionarios não empreendedores com maior valor máximo de patrimônio acumulado.
+
+
+## 4. Relação entre os bilionários e os países de residência
+
+```{r, echo=FALSE, error=FALSE, message=FALSE, warning= FALSE}
+#baixando os dados
+banco <- read.csv("Billionaires Statistics Dataset.csv", na.strings = "")
+
+
+
+#Manipulação de dados para construção de tabelas e gráficos
+banco$continent <-countrycode(sourcevar = banco[, "country"], 
+                              origin = "country.name",
+                              destination = "continent")
+
+banco$continentOfCitizenship <-countrycode(sourcevar = banco[, "countryOfCitizenship"], 
+                              origin = "country.name",
+                              destination = "continent")
+
+paises1 <- banco %>%
+  group_by(country) %>%
+  count()
+
+paises1 <- rename(paises1, NAME = country)
+
+paises1 <- na.omit(paises1)
+```
+
+O mapa a seguir, que apresenta a quantidade de bilionários em cada país analisado, pode ser utilizado para melhor compreender a distribuição de bilionários ao redor do mundo.
+
+![Mapa da distribuição de bilionários no mundo](meu_mapa.pdf)
+
+
+\begin{center}
+    \href{https://gahenvi.github.io/map/}{Link de uma versão interativa}
+\end{center}
+
+
+
+\newpage
+```{r, echo=FALSE, error=FALSE, message=FALSE, results= 'asis'}
+
+paises2 <- paises1 %>% 
+  arrange(desc(n)) %>% 
+  {.[0:15,]}
+
+colnames(paises2) <- c("País", "Número de bilionários")
+
+kable(paises2, format = "latex", caption = "Quinze países com maior número de bilionários") %>%
+   kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) 
+
+cat("\nCom base no mapa e na tabela acima, observa-se que os países com maior número de bilionários são os Estados Unidos, a China e a Índia, de modo que concentram 54,24% dos bilionários do mundo. Ademais, a quantidade de bilionários nos Estados Unidos e na China é significativamente maior do que nos demais países.\n")
+
+```
+
+## 5. Relação entre os bilionários e os continentes de residência/natalidade
+
+Para a análise da quantidade de bilionários por continente, foram feitos os seguintes gráficos:
+
+```{r fig-sub-5, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráfico de barras do número de bilionários por continente',out.width='.99\\linewidth', fig.height=3.43, fig.asp=NA, fig.ncol=1, fig.nrow=2}
+
+continente <- banco %>%
+  filter(!is.na(continent)) %>%
+  count(continent) %>%
+  mutate(continent = case_when(
+    continent %>% str_detect("Asia") ~ "Ásia",
+    continent %>% str_detect("Americas") ~ "Américas",
+    continent %>% str_detect("Europe") ~ "Europa",
+    continent %>% str_detect("Oceania") ~ "Oceania",
+    continent %>% str_detect("Africa") ~ "África"
+  )) %>%
+  mutate(
+    freq = n %>% percent(),
+  ) %>%
+  mutate(
+    freq = paste0(round(100*n/sum(n), digits = 2),'%'),
+    label = str_c(n, " (", gsub("\\.", ",", freq), ")") %>% str_squish()
+  )
+
+ggplot(continente) +
+  aes(x = fct_reorder(continent, n, .desc=T), y = n, label = label) +
+  geom_bar(stat = "identity", fill = "#A1D68B", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, hjust = .5,
+    size = 3
+  ) + 
+  scale_y_continuous(limits = c(0,1100)) +
+  labs(x = "Continente", y = "Número de bilionários") +
+  theme_minimal()
+
+
+```
+
+```{r fig-sub-6, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráfico sankey da migração da residência dos bilionários',out.width='.99\\linewidth', fig.width=6, fig.asp=NA, fig.ncol=1, fig.nrow=2, fig.align='center'}
+library(highcharter)
+library(tidyverse)
+library(patchwork)
+library(hrbrthemes)
+library(circlize)
+
+banco1 <- banco[,36:37]
+
+banco1 <- banco1 %>% 
+  dplyr::select(continentOfCitizenship, continent) %>%
+  group_by(continentOfCitizenship, continent)%>%
+  summarise(total = n())
+
+banco1 <- na.omit(banco1)
+
+colnames(banco1) <- c("Continente de origem", "Continente de destino", "Migração")
+
+library(networkD3)
+
+banco1$`Continente de origem` <- paste(banco1$`Continente de origem`, " ", sep="")
+
+nodes <- data.frame(name=c(as.character(banco1$`Continente de destino`), as.character(banco1$`Continente de origem`)) %>% unique())
+
+banco1$IDcontinentOfCitizenship=match(banco1$`Continente de origem`, nodes$name)-1 
+banco1$IDcontinent=match(banco1$`Continente de destino`, nodes$name)-1
+
+ColourScal ='d3.scaleOrdinal() .range(["#FDE725FF","#B4DE2CFF","#6DCD59FF","#35B779FF","#1F9E89FF","#26828EFF","#31688EFF","#3E4A89FF","#482878FF","#440154FF"])'
+
+sankeyNetwork(Links = banco1, Nodes = nodes,
+              Source = "IDcontinentOfCitizenship", Target = "IDcontinent",
+              Value = "Migração", NodeID = "name", 
+              sinksRight=FALSE, colourScale=ColourScal, nodeWidth=40, fontSize=13, nodePadding=20)
+```
+
+\begin{center}
+    \href{https://gahenvi.github.io/sankey_bil/}{Link de uma versão mais completa do gráfico sankey}
+\end{center}
+
+
+A partir da análise do gráfico de barras, é possível perceber que o continente com maior número de bilionários é a Ásia, com 41,47% do total de bilionários, o que reflete a presença de países com grande concentração de bilionários, como a China e a Índia. Ademais, a África é o país com menor quantidade de bilionários, com apenas 0,65% do total.
+
+Além disso, o gráfico Sankey apresentado mostra o fluxo de bilionários de seu continente de cidadania para o continente que residem atualmente. Com base nele, nota-se pouca migração de bilionários no sentido intercontinental. Os maiores fluxos observados foram da Europa para as Américas e das Américas para a Ásia, ambos de 25 pessoas.
+
+
+## parte do leo
+papapapa
+
+
+# Discussão
+
+Pode-se concluir pelos resultados que as análises são insuficientes para mostrar o comportamento de cada variável. As ferramentas disponíveis nos dão um parecer generalizado dos dados que não podem ser extravasados para a população e nem confirmados. Apesar dos coeficientes de variação não terem indicado associação entre a maioria das variáveis estudadas, só haveria a possibilidade de confirmar o comportamento realizando inferências.
+
+Desse modo, as maiores complicações foram acerca da limitação de ferramentas disponíveis para analisar a fundo a existência de associações no banco de dados e em como proceder com a análise exploratória, a partir dos resultados encontrados.
+
+Apesar diso tudo, é crucial entender a importância do estudo sobre os bilionários, para que, mesmo de maneira geral, as pessoas entendam como os dados podem se comportar, mesmo que não haja a possibilidade de se fazer a previsão. 
+
+
+# Referências bibliográficas
+## Extração dos dados:
+https://www.linkedin.com/pulse/para-que-serve-um-bilion%C3%A1rio-maite-schneider
+
+https://www.forbes.com/real-time-billionaires/#2e5847b53d78
+
+https://www.kaggle.com/code/achmadryanfauzi/bilionares-statistic-2023-data-insight
+
+## Medidas estatísticas:
+BUSSAB, W. O.; MORETTIN, P. A. Estatística Básica. 9. ed. São Paulo: Pearson, 2017.
+
+# Participações
+Júlia Lima Nosralla (232014825): Análises 4 e 5, revisão.
+
+Gabriel Henrique Ovidio de Araújo (232014905): Análises 2,3 e relatório.
+
+Leonardo Farias Saraiva (232014834): Análise 6, revisão.
+
+Maria Luiza Moura de Resende Ferro Costa (232014880): Análise 1 e relatório.
