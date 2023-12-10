@@ -12,15 +12,17 @@ header-includes:
 
 # Introdução
 
-  O conjunto de dados escolhido para este estudo exploratório é o "Bilionaires Statistics Dataset", obtido do Kaggle. Este banco de dados compreende 2640 observações e 35 variáveis, incluindo informações sobre o patrimônio total de cada bilionário, país de origem, idade, gênero e a origem de sua riqueza.
-  O objetivo deste estudo é investigar o comportamento do patrimônio total acumulado em relação a variáveis de diferentes categorias, visando identificar possíveis associações entre elas.
-  O software utilizado para as análises foi o R versão 4.3.1.
+$\hspace*{2em}$O conjunto de dados escolhido para este estudo exploratório é o "Bilionaires Statistics Dataset", obtido do Kaggle. Este banco de dados compreende 2640 observações e 35 variáveis, incluindo informações sobre o patrimônio total de cada bilionário, país de origem, idade, gênero e a origem de sua riqueza.
+
+$\hspace*{2em}$O objetivo deste estudo é investigar o comportamento do patrimônio total acumulado em relação a variáveis de diferentes categorias, visando identificar possíveis associações entre elas.
+
+$\hspace*{2em}$O software utilizado para as análises foi o R versão 4.3.1.
 
 \newpage
 
 # Metodologia
 
- Este conjunto de dados abrange um total de 35 variáveis que armazenam dados sobre bilionários, porém, para deixar o trabalho mais suscinto e organizado, foram escolhidas as variáveis que os estudantes julgaram ser mais interessantes para desenvolver a análise exploratória.
+$\hspace*{2em}$Este conjunto de dados abrange um total de 35 variáveis que armazenam dados sobre bilionários, porém, para deixar o trabalho mais suscinto e organizado, foram escolhidas as variáveis que os estudantes julgaram ser mais interessantes para desenvolver a análise exploratória.
  
 ```{r, include=FALSE}
 
@@ -136,8 +138,9 @@ kable(val_metodologia,"latex", caption = "Explicação das Variáveis") %>%
 
 
 
-  Para o estudo das variáveis, foram empregadas medidas de centralidade (como média e mediana) e medidas de dispersão (como desvio padrão e variância). Além disso, foram realizados cálculos estatísticos para verificar a existência de associações entre as variáveis e para quantificar a força dessas associações.
-  A análise é complementada por tabelas e gráficos que proporcionam uma representação visual do comportamento de cada variável, facilitando a interpretação dos resultados. Essa abordagem abrangente visa fornecer uma compreensão profunda das relações entre as variáveis no contexto dos bilionários estudados.
+$\hspace*{2em}$Para o estudo das variáveis, foram empregadas medidas de centralidade (como média e mediana) e medidas de dispersão (como desvio padrão e variância). Além disso, foram realizados cálculos estatísticos para verificar a existência de associações entre as variáveis e para quantificar a força dessas associações.
+
+$\hspace*{2em}$A análise é complementada por tabelas e gráficos que proporcionam uma representação visual do comportamento de cada variável, facilitando a interpretação dos resultados. Essa abordagem abrangente visa fornecer uma compreensão profunda das relações entre as variáveis no contexto dos bilionários estudados.
   
 ```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
 knitr::opts_chunk$set(echo = FALSE)
@@ -198,7 +201,6 @@ Objeto_analise
 modelo <- lm(patrimonio_bilhoes ~ genero)
 resumo_modelo <- summary(modelo)
 r_squared <- resumo_modelo$r.squared
-cat("O valor de R² é:", r_squared, "\n")
 ```
 
 
@@ -222,13 +224,13 @@ kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total e
   column_spec(2, width = "1cm")
 ```
 
-  Antes de procedermos à análise de associação, é relevante considerar algumas observações sobre as variáveis em questão. O conjunto de dados revela uma disparidade significativa entre o número de observações para o gênero masculino em comparação com o feminino, afinal, neste banco de dados existem 2640 observações e somente 337 delas são referentes a pessoas do gênero Feminino. Embora a disparidade persista, é essencial destacar um aumento significativo, de cerca de 50%, no número de mulheres bilionárias nos últimos anos. Esse aumento supera até mesmo o crescimento observado entre os homens no mesmo período. Assim, embora a maioria dos dados ainda esteja centrada no gênero masculino, a presença feminina registrou um notável e considerável aumento. 
+$\hspace*{2em}$Antes de procedermos à análise de associação, é relevante considerar algumas observações sobre as variáveis em questão. O conjunto de dados revela uma disparidade significativa entre o número de observações para o gênero masculino em comparação com o feminino, afinal, neste banco de dados existem 2640 observações e somente 337 delas são referentes a pessoas do gênero Feminino. Embora a disparidade persista, é essencial destacar um aumento significativo, de cerca de 50%, no número de mulheres bilionárias nos últimos anos. Esse aumento supera até mesmo o crescimento observado entre os homens no mesmo período. Assim, embora a maioria dos dados ainda esteja centrada no gênero masculino, a presença feminina registrou um notável e considerável aumento. 
   
-  É crucial destacar que a análise proposta não busca estabelecer causalidade. Desse modo, não se pode prever a realidade das mulheres que não são bilionárias e o porquê disso.
+$\hspace*{2em}$É crucial destacar que a análise proposta não busca estabelecer causalidade. Desse modo, não se pode prever a realidade das mulheres que não são bilionárias e o porquê disso.
 
-  Ao examinar o boxplot, é evidente a presença de vários outliers na distribuição do patrimônio para o gênero masculino. A caixa correspondente a esse grupo é visualmente menor, sugerindo, inicialmente, uma maior homogeneidade nos dados em comparação com o gênero feminino. Contudo, essa impressão é contrabalançada ao considerarmos o cálculo do desvio padrão. Os resultados indicam que a distribuição do patrimônio para o gênero feminino é mais centralizada, uma vez que apresenta menos outliers, mesmo que a caixa seja mais ampla. É válido observar que ambas as caixas são iniciadas do mesmo ponto, indicando a possibilidade de pelo menos um homem e uma mulher possuírem o mesmo patrimônio.  
+$\hspace*{2em}$Ao examinar o boxplot, é evidente a presença de vários outliers na distribuição do patrimônio para o gênero masculino. A caixa correspondente a esse grupo é visualmente menor, sugerindo, inicialmente, uma maior homogeneidade nos dados em comparação com o gênero feminino. Contudo, essa impressão é contrabalançada ao considerarmos o cálculo do desvio padrão. Os resultados indicam que a distribuição do patrimônio para o gênero feminino é mais centralizada, uma vez que apresenta menos outliers, mesmo que a caixa seja mais ampla. É válido observar que ambas as caixas são iniciadas do mesmo ponto, indicando a possibilidade de pelo menos um homem e uma mulher possuírem o mesmo patrimônio.  
 
-  A análise do coeficiente de determinação (R²) é crucial para avaliar a existência de associação entre as variáveis. Notavelmente, o valor obtido revela-se muito baixo, indicando uma associação extremamente fraca. Essa análise nos leva a crer que as variáveis gênero e patrimônio total são praticamente independentes uma da outra. Assim, a hipótese de associação não se sustenta, reforçando a ideia de que não há uma relação substancial entre o gênero e o patrimônio total nos dados analisados. 
+$\hspace*{2em}$A análise do coeficiente de determinação (R²) é crucial para avaliar a existência de associação entre as variáveis. O valor do coeficiente obtido, de 4.32614e-06, revela-se muito baixo, indicando uma associação extremamente fraca. Essa análise nos leva a crer que as variáveis gênero e patrimônio total são praticamente independentes uma da outra. Assim, a hipótese de associação não se sustenta, reforçando a ideia de que não há uma relação substancial entre o gênero e o patrimônio total nos dados analisados. 
   
 
 ## 2. Relação entre as indústrias e o patrimônio acumulado dos bilionários
@@ -247,10 +249,10 @@ levels(bil$industries) <- c("Automotivo", "Construção e Engenharia", "Diversif
                             "Esportes", "Tecnologia", "Telecomunicações")
 ```
 
-Para estudar a relação entre duas variáveis, é necessário primeiramente representar os dados.
+$\hspace*{2em}$Para estudar a relação entre duas variáveis, é necessário primeiramente representar os dados.
 
 ### Graficamente pelo box-plot:
-```{r fig-sub-2, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Box-plot do patrimônio acumulado(em log10) por bilionários daquela indústria',out.width='.99\\linewidth', fig.height=3.43, fig.asp=NA, fig.ncol=1, fig.nrow=2}
+```{r fig-sub-2, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Box-plot do patrimônio acumulado (em log10) pelo tipo de indústria',out.width='.99\\linewidth', fig.height=3.4, fig.asp=NA, fig.ncol=1, fig.nrow=2}
 # Cálculo do big_r (coeficiente de determinação)
 var_special <- (
   ((21.46703^2) * 73) + ((2.17642^2) * 45) + ((9.72292^2) * 187) + ((4.80104^2) * 100) +
@@ -265,7 +267,7 @@ ggplot(bil, aes(x=finalWorth, y=reorder(industries, finalWorth, median)))+
   geom_boxplot()+
   scale_x_log10()+
   labs(
-    x = "Patrimônio Acumulado(em bilhões)",
+    x = "Patrimônio Acumulado (em bilhões)",
     y = "Indústrias")+
   theme_minimal()+
   scale_color_brewer(palette = "Accent")
@@ -273,12 +275,12 @@ ggplot(bil, aes(x=finalWorth, y=reorder(industries, finalWorth, median)))+
 ```
 
 
-Analisando o boxplot, observamos certo comportamento padronizado independente da indústria. Temos a indústria tecnológica com alta quantidade de outliers e logística com maior mediana. Contudo foi-se também calculado o coeficiente de determinação (R²) para verificar a falta de associação entre as variáveis indústria e patrimônio acumulado. O resultado do coeficiente é igual a `r round(big_r, 2)`. Como ele varia de 0 a 1 e o nosso apresenta um valor muito próximo de 0, podemos afirmar a falta de associação. Isso representa que saber ou não a indústria do bilionário, não nós ajuda a saber o patrimônio acumulado dele.
+$\hspace*{2em}$Analisando o boxplot, observamos certo comportamento padronizado independente da indústria. Temos a indústria tecnológica com alta quantidade de outliers e logística com maior mediana. Contudo foi-se também calculado o coeficiente de determinação (R²) para verificar a falta de associação entre as variáveis indústria e patrimônio acumulado. O resultado do coeficiente é igual a `r round(big_r, 2)`. Como ele varia de 0 a 1 e o nosso apresenta um valor muito próximo de 0, podemos afirmar que a associação é baixíssima. Isso representa que saber ou não a indústria do bilionário, não nós ajuda a saber o patrimônio acumulado dele.
 
 
 ### Pela tabela:
 
-Ademais, também foi feita uma tabela com certas medidas-resumo para descrever melhor esses dados. A coluna "Outliers" é a porcentagem da distribuição daquela indústria que são outliers.
+$\hspace*{2em}$Ademais, também foi feita uma tabela com certas medidas-resumo para descrever melhor esses dados. A coluna "Outliers" é a porcentagem da distribuição daquela indústria que são outliers.
 
 ```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
 #função para contar outliers
@@ -312,7 +314,7 @@ kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total e
   column_spec(8, width = "1cm")
 ```
 
-Através da tabela, observamos que a indústria automotiva tem a maior média e maior desvio padrão, como também segundo maior valor máximo. Essa indústria também tem a maior quantidade relativa de outliers. Suspeitamos, então de uma associação positiva entre a N (quantidade de observações daquela indústria) e o S (desvio-padrão). Ao representar gráficamente, temos:
+$\hspace*{2em}$Através da tabela, observamos que a indústria automotiva tem a maior média e maior desvio padrão, como também segundo maior valor máximo. Essa indústria também tem a maior quantidade relativa de outliers. Suspeitamos, então de uma associação positiva entre a N (quantidade de observações daquela indústria) e o S (desvio-padrão). Ao representar gráficamente, temos:
 
 ```{r fig-sub-3, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráfico de dispersão das médias pelos desvios-padrão das indústrias (em bilhões)',out.width='.99\\linewidth', fig.height=2, fig.asp=NA, fig.ncol=1, fig.nrow=2, fig.align='center', fig.pos='H'}
 
@@ -329,14 +331,13 @@ ggplot(tabela_resumo, aes(x=Media, y=S))+
   scale_color_brewer(palette = "Accent")
 ```
 
-Dessa maneira, ao calcular o coeficiente de Pearson (r), medida que verifica o grau de relação linear entre duas variáveis quantitativas, podemos confirmar associação linear positiva e forte entre a média e o desvio-padrão do patrimônio acumulado dos bilionários separado por indústrias. O valor do coeficiente varia em modulo de 0 a 1 e, por estar muito próximo de 1, indica associação forte. Além disso, como ele é maior que 0, há uma associação positiva entre as duas variáveis. Desse modo, quanto maior o patrimônio acumulado médio da indústria, mais disperso é o patrimônio dos seus bilionários. 
+$\hspace*{2em}$Dessa maneira, ao calcular o coeficiente de Pearson (r), medida que verifica o grau de relação linear entre duas variáveis quantitativas, podemos confirmar associação linear positiva e forte entre a média e o desvio-padrão do patrimônio acumulado dos bilionários separado por indústrias. O valor do coeficiente varia em modulo de 0 a 1 e, por estar muito próximo de 1, indica associação forte. Além disso, como ele é maior que 0, há uma associação positiva entre as duas variáveis. Desse modo, quanto maior o patrimônio acumulado médio da indústria, mais disperso é o patrimônio dos seus bilionários. 
 
 
 
+## 3. Relação entre bilionários empreendedores ou não e seu patrimônio acumulado
 
-## 3. Relação entre a bilionários empreendedores ou não e seu patrimônio acumulado
-
-É necessário, em primeira instância, representar os dados graficamente. Como estamos tratando de uma variável quantitativa para duas categorias diferentes, utilizaremos novamente o boxplot.
+$\hspace*{2em}$É necessário, em primeira instância, representar os dados graficamente. Como estamos tratando de uma variável quantitativa para duas categorias diferentes, utilizaremos novamente o boxplot.
 
 
 ```{r fig-sub-4, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráficos do patrimônio acumulado separado pela variável empreendedor', fig.subcap=c('Box-plot', 'Gráfico de densidade'),  out.width='.99\\linewidth', fig.height=2.7, fig.asp=NA, fig.ncol=1, fig.nrow=2, fig.align='center', fig.pos='H'}
@@ -361,9 +362,9 @@ as2<- skew(as2$finalWorth)
 
 
 #boxplot
-ggplot(bil, aes(x = selfMade, y = finalWorth, fill = selfMade)) +
+ggplot(bil, aes(x = selfMade, y = finalWorth, color = selfMade)) +
   geom_boxplot() +
-  labs(x = "É empreendedor", y = "Patrimônio acumulado", fill="É empreendedor") +
+  labs(x = "É empreendedor", y = "Patrimônio acumulado", color="É empreendedor") +
   scale_y_log10()+
   theme_minimal()+
   scale_color_brewer(palette = "Accent")
@@ -383,7 +384,9 @@ ggplot(bil, aes(x=finalWorth))+
 
 
 ```
-Através do boxplot, podemos confimar a presença de múltiplos outliers independente do bilionário ser empreendedor ou não. Ao observar o gráfico de densidade, suspeita-se de uma assimetria positiva. Ao calcularmos, obtemos valores de assimetria de `r round(as1,2)` para os empreendedores e `r round(as2, 2)` para os outros. Com isso, confirmamos a presença de assimetria positiva e forte, dado que seu valor em módulo é maior que 1. Além do mais, devemos calcular o coeficiente de determinação novamente para verificar se há associação entre as duas variáveis, uma quantitativa e a outra qualitativa. Como o R² assume o valor `r round(another_r,4)`, podemos afirmar uma falta de associação, dado que esse coeficiente varia entre 0 e 1 e encontramos um valor demasiado próximo de 0. Foi-se criada também uma tabela com as medidas-resumo para melhor analisar as categorias.
+$\hspace*{2em}$Através do boxplot, podemos confimar a presença de múltiplos outliers independente do bilionário ser empreendedor ou não. Ao observar o gráfico de densidade, suspeita-se de uma assimetria positiva nos dados. Ao calcularmos, obtemos valores de assimetria de `r round(as1,2)` para os empreendedores e `r round(as2, 2)` para os outros. Com isso, confirmamos a presença de assimetria positiva e forte, dado que seu valor em módulo é maior que 1. Ou seja, há uma concentração maior de bilionários com patrimônio abaixo de 10 bilhões. 
+
+$\hspace*{2em}$Além do mais, devemos calcular o coeficiente de determinação novamente para verificar se há associação entre as duas variáveis, uma quantitativa e a outra qualitativa. Como o R² assume o valor `r round(another_r,4)`, podemos afirmar uma falta de associação, dado que esse coeficiente varia entre 0 e 1 e encontramos um valor demasiado próximo de 0. Foi-se criada também uma tabela com as medidas-resumo para melhor analisar as categorias.
 
 ```{r, echo=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.pos='H'}
 
@@ -406,7 +409,7 @@ kable(tabela_sm,format="latex" , caption = "Medidas do patrimônio acumulado em 
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
 
-Pela tabela, podemos observar um comportamento muito parecido em quase todos os níveis, apesar da quantidade de bilionários empreendedores ser muito maior. Da mesma maneira, temos os bilionarios não empreendedores com maior valor máximo de patrimônio acumulado.
+$\hspace*{2em}$Pela tabela, podemos observar um comportamento muito parecido em quase todos os níveis, apesar da quantidade de bilionários empreendedores ser muito maior. Da mesma maneira, temos os bilionarios não empreendedores com maior valor máximo de patrimônio acumulado.
 
 
 ## 4. Relação entre os bilionários e os países de residência
@@ -435,7 +438,7 @@ paises1 <- rename(paises1, NAME = country)
 paises1 <- na.omit(paises1)
 ```
 
-O mapa a seguir, que apresenta a quantidade de bilionários em cada país analisado, pode ser utilizado para melhor compreender a distribuição de bilionários ao redor do mundo.
+$\hspace*{2em}$O mapa a seguir, que apresenta a quantidade de bilionários em cada país analisado, pode ser utilizado para melhor compreender a distribuição de bilionários ao redor do mundo.
 
 ![Mapa da distribuição de bilionários no mundo](meu_mapa.pdf)
 
@@ -458,13 +461,13 @@ colnames(paises2) <- c("País", "Número de bilionários")
 kable(paises2, format = "latex", caption = "Quinze países com maior número de bilionários") %>%
    kable_styling(latex_options = c("striped", "hold_position"), repeat_header_text = TRUE) 
 
-cat("\nCom base no mapa e na tabela acima, observa-se que os países com maior número de bilionários são os Estados Unidos, a China e a Índia, de modo que concentram 54,24% dos bilionários do mundo. Ademais, a quantidade de bilionários nos Estados Unidos e na China é significativamente maior do que nos demais países.\n")
-
 ```
+$\hspace*{2em}$Com base no mapa e na tabela acima, observa-se que os países com maior número de bilionários são os Estados Unidos, a China e a Índia, de modo que concentram 54,24% dos bilionários do mundo. Ademais, a quantidade de bilionários nos Estados Unidos e na China é significativamente maior do que nos demais países.
+
 
 ## 5. Relação entre os bilionários e os continentes de residência/natalidade
 
-Para a análise da quantidade de bilionários por continente, foram feitos os seguintes gráficos:
+$\hspace*{2em}$Para a análise da quantidade de bilionários por continente, foram feitos os seguintes gráficos:
 
 ```{r fig-sub-5, echo=FALSE, error=FALSE, message=FALSE, fig.cap='Gráfico de barras do número de bilionários por continente',out.width='.99\\linewidth', fig.height=3.43, fig.asp=NA, fig.ncol=1, fig.nrow=2}
 
@@ -541,9 +544,9 @@ sankeyNetwork(Links = banco1, Nodes = nodes,
 \end{center}
 
 
-A partir da análise do gráfico de barras, é possível perceber que o continente com maior número de bilionários é a Ásia, com 41,47% do total de bilionários, o que reflete a presença de países com grande concentração de bilionários, como a China e a Índia. Ademais, a África é o país com menor quantidade de bilionários, com apenas 0,65% do total.
+$\hspace*{2em}$A partir da análise do gráfico de barras, é possível perceber que o continente com maior número de bilionários é a Ásia, com 41,47% do total de bilionários, o que reflete a presença de países com grande concentração de bilionários, como a China e a Índia. Em seguida, as Américas e a Europa concentram 33,67% e 22,48% dos bilionários, respectivamente. Por fim, a Oceania e a África apresentam uma quantidade menor de bilionários em relação aos demais continentes. O menor valor observado foi na África, que possui apenas 0,65% do total.
 
-Além disso, o gráfico Sankey apresentado mostra o fluxo de bilionários de seu continente de cidadania para o continente que residem atualmente. Com base nele, nota-se pouca migração de bilionários no sentido intercontinental. Os maiores fluxos observados foram da Europa para as Américas e das Américas para a Ásia, ambos de 25 pessoas.
+$\hspace*{2em}$Além disso, o gráfico Sankey apresentado mostra o fluxo de bilionários de seu continente de cidadania para o continente que residem atualmente. Com base nele, nota-se pouca migração de bilionários no sentido intercontinental. Os maiores fluxos observados foram da Europa para as Américas e das Américas para a Ásia, ambos de 25 pessoas.
 
 
 ## parte do leo
@@ -552,11 +555,19 @@ papapapa
 
 # Discussão
 
-Pode-se concluir pelos resultados que as análises são insuficientes para mostrar o comportamento de cada variável. As ferramentas disponíveis nos dão um parecer generalizado dos dados que não podem ser extravasados para a população e nem confirmados. Apesar dos coeficientes de variação não terem indicado associação entre a maioria das variáveis estudadas, só haveria a possibilidade de confirmar o comportamento realizando inferências.
+$\hspace*{2em}$A partir dos resultados obtidos, pode-se extrair informações relevantes acerca das características dos bilionários ao redor do mundo.
 
-Desse modo, as maiores complicações foram acerca da limitação de ferramentas disponíveis para analisar a fundo a existência de associações no banco de dados e em como proceder com a análise exploratória, a partir dos resultados encontrados.
+$\hspace*{2em}$Com base nas análises, observa-se que não há uma associação significativa do patrimônio acumulado dos bilionários com o gênero, com o tipo de indústria nem com o fato de serem empreendedores ou não. Contudo, foi possível notar uma associação linear forte e positiva na relação entre o patrimônio médio dos bilionários de cada tipo de indústria e o desvio-padrão dos patrimônios dos bilionários dessa indústria.
 
-Apesar diso tudo, é crucial entender a importância do estudo sobre os bilionários, para que, mesmo de maneira geral, as pessoas entendam como os dados podem se comportar, mesmo que não haja a possibilidade de se fazer a previsão. 
+$\hspace*{2em}$Além disso, percebe-se uma forte assimetria positiva em relação ao patrimônio acumulado dos bilionários. A maioria dos bilionários apresenta patrimônio abaixo de 10 bilhões de dólares.
+
+$\hspace*{2em}$Sobre a localização dos bilionários, pode-se concluir que há uma maior concentração de bilionário na Ásia e nas Américas. Ademais, foi observado que a maioria dos bilionários reside atualmente no continente de sua cidadania.
+
+$\hspace*{2em}$Por fim, vale ressaltar que as ferramentas disponíveis nos dão um parecer generalizado dos dados e os resultados não podem ser extravasados para a população.
+
+$\hspace*{2em}$Desse modo, as maiores complicações foram acerca da limitação de ferramentas disponíveis para analisar a fundo a existência de associações no banco de dados e em como proceder com a análise exploratória a partir dos resultados encontrados.
+
+$\hspace*{2em}$Apesar disso, é crucial entender a importância do estudo sobre os bilionários, uma vez que, com base nos resultados, é possível obter uma melhor compreensão de como os dados podem se comportar, mesmo que não haja a possibilidade de se fazer uma previsão. 
 
 
 # Referências bibliográficas
