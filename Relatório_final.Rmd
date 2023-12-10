@@ -12,7 +12,6 @@ header-includes:
 
 # Introdução
 
- 
   O conjunto de dados escolhido para este estudo exploratório é o "Bilionaires Statistics Dataset", obtido do Kaggle. Este banco de dados compreende 2640 observações e 35 variáveis, incluindo informações sobre o patrimônio total de cada bilionário, país de origem, idade, gênero e a origem de sua riqueza.
   O objetivo deste estudo é investigar o comportamento do patrimônio total acumulado em relação a variáveis de diferentes categorias, visando identificar possíveis associações entre elas.
 
@@ -201,11 +200,11 @@ tabela_resumo <- Banco_de_dados %>%
   group_by(gender) %>%
   summarize(n=n(), Media = mean(finalWorth), S = sd(finalWorth), Mediana = median(finalWorth), Min = min(finalWorth), Max = max(finalWorth), Outliers = count_outliers(finalWorth)/n) %>%
   mutate(
-    Genero = gender,
+    Sexo = gender,
     Media = round(Media, 2),
     S = round(S, 2),
     Outliers = round(Outliers, 3)) %>%
-  dplyr::select(Genero, Media, Mediana, S, Min, Max, Outliers, n) %>%
+  dplyr::select(Sexo, Media, Mediana, S, Min, Max, Outliers, n) %>%
   arrange(desc(Outliers))
   
 kable(tabela_resumo, format = "latex", caption = "Medidas do patrimônio total em Bilhões") %>%
