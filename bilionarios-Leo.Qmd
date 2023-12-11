@@ -1,0 +1,169 @@
+---
+title: "Análise Bilionários"
+format: html
+editor: visual
+---
+
+# Análise Bilionários
+
+## Leitura e exploração inicial
+
+```{r}
+bil <- read.csv("Billionaires Statistics Dataset.csv")
+```
+
+```{r}
+head(bil)
+```
+
+```{r}
+mean(bil$finalWorth * 1000000)
+```
+
+## Tratamento
+
+Verificar os tipos das variáveis a serem usadas na análise
+
+```{r}
+typeof(bil$finalWorth)
+typeof(bil$gdp_country)
+typeof(bil$age)
+typeof(bil$country)
+typeof(bil$cpi_country)
+typeof(bil$cpi_change_country)
+typeof(bil$tax_revenue_country_country)
+typeof(bil$total_tax_rate_country)
+```
+
+Comparar valores únicos dos países com os PIBs
+
+```{r}
+length(unique(bil$gdp_country))
+length(unique(bil$country))
+```
+
+Há mais valores únicos de países do que de PIB. Isso pode se dar devido à existência de valores faltantes ou inconsistência da base de dados. Assim, considerando que o PIB é uma métrica cujo cálculo é uma aproximação, seria importante explorar as ocorrências do PIB na base de dados e verificar se há valores duplicados para um mesmo país.
+
+```{r}
+unique(bil$gdp_country)
+```
+
+Limpar dados de bilionários de países cujo PIB não está disponível
+
+```{r}
+bil_limpo <- bil[!is.na(bil$gdp_country), ]
+bil_limpo <- bil[!(bil$gdp_country == ""), ]
+```
+
+Contar valores únicos novamente
+
+```{r}
+length(unique(bil_limpo$gdp_country))
+length(unique(bil_limpo$country))
+```
+
+Verificar correspondência entre valores únicos
+
+```{r}
+ab <- length(unique(bil_limpo$gdp_country)) == length(unique(bil_limpo$country))
+ba <- length(unique(bil_limpo$country)) == length(unique(bil_limpo$gdp_country))
+ab
+ba
+```
+
+```{r}
+remover <- which(!duplicated(bil_limpo$country) & !duplicated(bil_limpo$gdp_country, fromLast = TRUE))
+bil_limpo <- bil_limpo[-remover, ]
+length(unique(bil_limpo$gdp_country))
+length(unique(bil_limpo$country))
+```
+
+Agora que os valores únicos correspondem, podemos transformar a variável PIB em numérica, adicionando a coluna `gdp_num` ao dataset.
+
+```{r}
+install.packages("stringr")
+library(stringr)
+```
+
+```{r}
+bil_limpo$gdp_num <- str_remove_all(bil_limpo$gdp_country, "[^0-9.]") |>
+  as.numeric()
+head(bil_limpo)
+```
+
+Vejamos os valores singulares dos PIBs dos países, em formato numérico
+
+```{r}
+format(unique(bil_limpo$gdp_num), scientific = FALSE)
+```
+
+## Verificar o impacto dos bilionários na economia do país onde residem
+
+Os bilionários impactam positivamente a economia do país onde residem?
+
+Para fazer essa análise, podemos avaliar se existe correlação entre a quantidade de bilionários que residem em um país e o PIB do mesmo, conforme os dados gerados para o seguinte dataframe.
+
+```{r}
+#install.packages("dplyr")
+library(dplyr)
+bil_gdp <- bil_limpo |>
+  group_by(bil_limpo$country) |>
+  summarise(GDP = format(mean(gdp_num), scientific = FALSE), n_bil = n())
+```
+
+Vamos plotar um gráfico de dispersão.
+
+```{r}
+#install.packages("ggplot2")
+library(ggplot2)
+ggplot(bil_gdp, aes(x = n_bil, y = as.numeric(GDP))) +
+  geom_point(color = "#A1D68B", size = 2) +
+  scale_y_log10(
+    breaks = c(1e+10, 1e+11, 1e+12, 1e+13),
+    labels = c("10", "11", "12", "13")
+    ) +
+  scale_colour_brewer(palette = "Accent") +
+  labs(title = "Gráfico de dispersão das variáveis PIB\n  e quantidade de bilionários por país", x = "Quantidade de bilionários", y = "Produto Interno Bruto\n(em potências de 10)") +
+  theme_minimal()
+```
+
+O gráfico nos dá indícios de uma tendência de associação positiva entre as variáveis, mas dada a magnitude dos valores dos PIBs, é difícil ter uma noção muito clara do quão forte seria essa associação. Para obtermos um retrato mais claro da relação entre essas variáveis, podemos calcular o coeficiente de correlação de Spearman.
+
+```{r}
+cor(log(as.numeric(bil_gdp$GDP)), bil_gdp$n_bil, method = "spearman")
+```
+
+Um coeficiente de Spearman de 0.8 indica uma correlação positiva forte entre essas duas variáveis, o que significa que, quando uma delas aumenta de valor, a outra tende a não diminuir.
+
+## Patrimônio e idade
+
+Existe associação entre as variáveis patrimônio e idade dos bilionários?
+
+Para verificar essa hipótese, podemos plotar um gráfico de dispersão para essas duas variáveis.
+
+```{r}
+bil_limpo <- bil_limpo[!is.na(bil_limpo$finalWorth), ]
+bil_limpo <- bil_limpo[!(bil_limpo$finalWorth == ""), ]
+bil_limpo <- bil_limpo[!is.na(bil_limpo$age), ]
+bil_limpo <- bil_limpo[!(bil_limpo$age == ""), ]
+```
+
+```{r}
+ggplot(bil_limpo, aes(x = finalWorth, y = age)) +
+  geom_point(color = "#A1D68B", size = 2) +
+  scale_x_log10(
+    breaks = c(1e+03, 1e+04, 1e+05),
+    labels = c("1.000", "10.000", "100.000")
+    ) +
+  scale_colour_brewer(palette = "Accent") +
+  labs(title = "Gráfico de dispersão das variáveis patrimônio e idade", x = "Patrimônio (em milhões de dólares)", y = "Idade") +
+  theme_minimal()
+```
+
+Como fica evidente neste gráfico, não existe nenhuma associação clara entre idade e patrimônio para os bilionários. Para que tenhamos uma noção mais clara, podemos novamente calcular o coeficiente de Spearman.
+
+```{r}
+cor(log(bil_limpo$finalWorth), bil_limpo$age, method = "spearman")
+```
+
+Aqui, temos um coeficiente de Spearman de 0.14, que indica uma associação muito fraca entre as duas variáveis.
